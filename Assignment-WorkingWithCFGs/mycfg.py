@@ -9,6 +9,7 @@ Assignment: Control Flow Graph (CFG) Program
 
 import json
 import sys
+from collections import deque # for queue implementation
 
 TERMS = 'jmp', 'br', 'ret' # terminators used to indicate a change of control flow
 
@@ -68,8 +69,30 @@ def cfg_alg(nameblock_map):
 
 
 ## FUNCTIONS for Working with CFGs assignment
-'''
+
 def get_path_lengths(cfg, entry):
+    
+    path_lengths = {}
+    visited = set()
+    q = deque()
+    
+    q.append(entry)
+    visited.add(entry)
+    
+    path_lengths[entry] = 0
+    
+    while q:
+        current_node = q.popleft()
+        successors = cfg[current_node]
+        for succ in successors:
+            if succ not in visited:
+                visited.add(succ)
+                q.append(succ)
+                path_lengths[succ] = path_lengths[current_node] + 1
+                
+    return path_lengths
+          
+    
 
 """
 Compute the shortest path length (in edges) from the entry node to each node in the CFG.
@@ -84,7 +107,7 @@ Compute the shortest path length (in edges) from the entry node to each node in 
 
         dict: {node: distance from entry}, unreachable nodes are omitted
 """
-
+'''
 
 def reverse_postorder(cfg, entry):
 
@@ -132,7 +155,6 @@ Determine whether a CFG is reducible.
 
     Returns: True if the CFG is reducible or False if the CFG is irreducible
 """
-
 '''
                 
 def mycfg():
@@ -140,7 +162,7 @@ def mycfg():
     for func in prog['functions']:
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
-        
+             
         print('digraph {} {{'.format(func['name']))
         for name in name_to_block:
             print('  {};'.format(name))
@@ -148,9 +170,7 @@ def mycfg():
             for succ in succs:
                 print ('  {} -> {};'.format(name,succ))
         print('}')
-        
-##THIS IS A TEST
-        
+                
 
 if __name__ == '__main__':
     mycfg()
