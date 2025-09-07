@@ -10,8 +10,11 @@ Assignment: Control Flow Graph (CFG) Program
 import json
 import sys
 
-TERMS = 'jmp', 'br', 'ret'
+TERMS = 'jmp', 'br', 'ret' # terminators used to indicate a change of control flow
 
+## FUNCTIONS for creating a control flow graph (CFG)
+
+# The function basic_block_alg takes instructions and forms the basic blocks of the cfg
 def basic_block_alg(instructions):
     block = []
     for i in instructions:
@@ -26,6 +29,7 @@ def basic_block_alg(instructions):
     
     yield block
 
+# The function block_map maps out all the blocks of the cfg
 def block_map(blocks):
     out = {}
     
@@ -42,7 +46,7 @@ def block_map(blocks):
         
     return out
 
-   
+# The function cfg_alg takes the block_map and creates a cfg   
 def cfg_alg(nameblock_map):
     cfg = {}
     names = list(nameblock_map.keys())
@@ -63,6 +67,73 @@ def cfg_alg(nameblock_map):
     return cfg
 
 
+## FUNCTIONS for Working with CFGs assignment
+'''
+def get_path_lengths(cfg, entry):
+
+"""
+Compute the shortest path length (in edges) from the entry node to each node in the CFG.
+
+    Parameters:
+
+        cfg (dict): mapping {node: [successors]}
+
+        entry (str): starting node
+
+    Returns:
+
+        dict: {node: distance from entry}, unreachable nodes are omitted
+"""
+
+
+def reverse_postorder(cfg, entry):
+
+"""
+Compute reverse postorder (RPO) for a CFG.
+
+    Parameters:
+
+        cfg (dict): mapping {node: [successors]}
+
+        entry (str): starting node
+
+    Returns:
+
+        list: nodes in reverse postorder
+"""
+
+
+def find_back_edges(cfg, entry):
+
+"""
+Find back edges in a CFG using DFS.
+
+    Parameters:
+
+        cfg(dict): mapping {node: [successors]}
+
+        entry(str): starting node
+
+    Returns: list of edges (u,v) where u->v is a back edge
+
+"""
+
+
+def is_reducible(cfg, entry):
+
+"""
+Determine whether a CFG is reducible.
+
+    Parameters:
+
+        cfg(dict): mapping {node: [successors]}
+
+        entry(str): starting node
+
+    Returns: True if the CFG is reducible or False if the CFG is irreducible
+"""
+
+'''
                 
 def mycfg():
     prog = json.load(sys.stdin)
@@ -78,6 +149,7 @@ def mycfg():
                 print ('  {} -> {};'.format(name,succ))
         print('}')
         
+##THIS IS A TEST
         
 
 if __name__ == '__main__':
