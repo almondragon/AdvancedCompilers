@@ -93,7 +93,7 @@ def get_path_lengths(cfg, entry):
                 
     return path_lengths
           
-
+# The function reverse_postorder returns a list of nodes in reverse post order
 def reverse_postorder(cfg, entry):
     
     visited = set()
@@ -112,7 +112,7 @@ def reverse_postorder(cfg, entry):
     
 
 
-
+#The function find_back_edges returns a list of edges where one vertex is the ancestor of a current vertex in the recursion tree
 def find_back_edges(cfg, entry):
     
     back_edges = []
@@ -138,36 +138,61 @@ def find_back_edges(cfg, entry):
     
         
     
+def is_reducible(cfg, entry):    
+
+    reduced_cfg = {}    
+        
+    # remove self-edges
+    for node in cfg:
+        reduced_successors = [succ for succ in cfg[node] if succ != node]
+        reduced_cfg[node] = reduced_successors
+        
+    # merge with predecessor
+    def compute_predecessors(cfg):
+        predecessors = {node: set() for node in cfg}
+        
+        for src in cfg:
+            for dest in cfg[src]:
+                predecessors[dest].add(src)
+                
+        return predecessors
     
-
-"""
-Find back edges in a CFG using DFS.
-
-    Parameters:
-
-        cfg(dict): mapping {node: [successors]}
-
-        entry(str): starting node
-
-    Returns: list of edges (u,v) where u->v is a back edge
-
-"""
-
-'''
-def is_reducible(cfg, entry):
-
-"""
-Determine whether a CFG is reducible.
-
-    Parameters:
-
-        cfg(dict): mapping {node: [successors]}
-
-        entry(str): starting node
-
-    Returns: True if the CFG is reducible or False if the CFG is irreducible
-"""
-'''
+    predecessors = compute_predecessors(reduced_cfg)
+    
+    # reduce
+    
+    while True:
+        modification = False 
+        for node in list(reduced_cfg):
+            if node == entry:
+                continue 
+            node_predeccesors = list(predecessors[node])
+            if len(node_predeccesors) == 1:
+                pred = node_predeccesors[0]
+                
+                # merge node successors into predeccessors successors
+                
+                for succ in reduced_cfg[node]:
+                    if succ != pred and succ not in reduced_cfg[pred]:
+                        reduced_cfg[pred].append(succ)
+                        predecessors[succ].add(pred)
+                    predecessors[succ].discard(node)
+                    
+                del reduced_cfg[node]
+                del predecessors[node]
+                
+                if node in reduced_cfg[pred]:
+                    reduced_cfg[pred].remove(node)
+                
+                modification = True
+                break
+            
+        if not modification:
+            break
+        
+    return len(reduced_cfg) == 1 and entry in reduced_cfg
+                
+                
                 
 def mycfg():
     prog = json.load(sys.stdin)
@@ -175,7 +200,7 @@ def mycfg():
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
         
-        print(find_back_edges(cfg, 'b0'))
+        print(is_reducible(cfg, 'b0'))
                      
         print('digraph {} {{'.format(func['name']))
         for name in name_to_block:
