@@ -70,6 +70,7 @@ def cfg_alg(nameblock_map):
 
 ## FUNCTIONS for Working with CFGs assignment
 
+# The function get_path_lengths serves to return the lengths of each path it takes to go to each node from the given entry point
 def get_path_lengths(cfg, entry):
     
     path_lengths = {}
@@ -92,39 +93,25 @@ def get_path_lengths(cfg, entry):
                 
     return path_lengths
           
-    
-
-"""
-Compute the shortest path length (in edges) from the entry node to each node in the CFG.
-
-    Parameters:
-
-        cfg (dict): mapping {node: [successors]}
-
-        entry (str): starting node
-
-    Returns:
-
-        dict: {node: distance from entry}, unreachable nodes are omitted
-"""
-'''
 
 def reverse_postorder(cfg, entry):
+    
+    visited = set()
+    post_order = []
+    
+    def dfs_traversal(node):
+        visited.add(node)
+        successors = cfg[node]
+        for succ in sorted(successors): 
+            if succ not in visited:
+                dfs_traversal(succ)
+        post_order.append(node)
+    dfs_traversal(entry)
+    
+    return list(reversed(post_order))
+    
 
-"""
-Compute reverse postorder (RPO) for a CFG.
-
-    Parameters:
-
-        cfg (dict): mapping {node: [successors]}
-
-        entry (str): starting node
-
-    Returns:
-
-        list: nodes in reverse postorder
-"""
-
+'''
 
 def find_back_edges(cfg, entry):
 
@@ -162,6 +149,12 @@ def mycfg():
     for func in prog['functions']:
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
+        
+        print('cfg here below')
+        print(cfg)
+        print('reverse post order below')
+        
+        print(reverse_postorder(cfg, 'b0'))
              
         print('digraph {} {{'.format(func['name']))
         for name in name_to_block:
