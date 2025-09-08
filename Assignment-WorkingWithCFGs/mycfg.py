@@ -137,7 +137,7 @@ def find_back_edges(cfg, entry):
         return back_edges
     
         
-    
+# The fuction is_reducible determines where a CFG is reducible or not  
 def is_reducible(cfg, entry):    
 
     reduced_cfg = {}    
@@ -199,8 +199,6 @@ def mycfg():
     for func in prog['functions']:
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
-        
-        print(is_reducible(cfg, 'b0'))
                      
         print('digraph {} {{'.format(func['name']))
         for name in name_to_block:
