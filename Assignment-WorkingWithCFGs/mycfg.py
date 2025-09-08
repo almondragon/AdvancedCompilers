@@ -111,9 +111,34 @@ def reverse_postorder(cfg, entry):
     return list(reversed(post_order))
     
 
-'''
+
 
 def find_back_edges(cfg, entry):
+    
+    back_edges = []
+    visited = set ()
+    ancestors = set()
+    
+    def dfs_traversal(node):
+        visited.add(node)
+        ancestors.add(node)
+        successors = cfg[node]
+        for succ in sorted(successors): 
+            if succ not in visited:
+                dfs_traversal(succ)
+            elif succ in ancestors:
+                back_edges.append((node, succ))
+        ancestors.remove(node)
+    dfs_traversal(entry)
+    
+    if len(back_edges) == 0:
+        return 'There are no back edges found in this CFG.'
+    else:
+        return back_edges
+    
+        
+    
+    
 
 """
 Find back edges in a CFG using DFS.
@@ -128,7 +153,7 @@ Find back edges in a CFG using DFS.
 
 """
 
-
+'''
 def is_reducible(cfg, entry):
 
 """
@@ -150,12 +175,8 @@ def mycfg():
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
         
-        print('cfg here below')
-        print(cfg)
-        print('reverse post order below')
-        
-        print(reverse_postorder(cfg, 'b0'))
-             
+        print(find_back_edges(cfg, 'b0'))
+                     
         print('digraph {} {{'.format(func['name']))
         for name in name_to_block:
             print('  {};'.format(name))
