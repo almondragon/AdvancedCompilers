@@ -1,24 +1,71 @@
 # Working with CFGs
 **Due Date:** September 12, 2025
 
-This folder of the repository contains a Python program for constructing and analyzing control flow graphs (CFGs) for Bril programs. The code also implements additional functionality including computing path lengths, reverse post order traversal, back edge detection, as well as checking reducibility
+This folder of the repository contains a Python program for constructing control flow graphs (CFGs) for Bril programs. The code also implements additional functionality including computing path lengths, reverse post order traversal, back edge detection, as well as checking reducibility.
 
 ## Features
-1. get_path_lengths(cfg, entry) - computes the shortest path length (in edges) from the entry node to each node in the CFG.
+### CFG Construction
+1. **basic_block_alg(instructions)** - takes a bril program's instructions and turns them into basic blocks
 
-Parameters           | Description
--------------------- | -----------
-Working with CFGS    | A python program made to construct a control flow
-Working with CFGS    | A python program made to construct a control flo 
+2. **block_map(blocks)** - maps basic blocks to names
 
+3. **cfg_alg(nameblock_map)** - creates a CFG when given a map of named blocks.
 
+### CFG Analysis
+4. **get_path_lengths(cfg, entry)** - computes the shortest path length (in edges) from the entry node to each node in the CFG.
+
+5. **reverse_postorder(cfg, entry)** - compute reverse postorder for a CFG.
+
+6. **find_back_edges(cfg,entry)** - find back edges in a CFG using DFS.
+
+7. **is_reducible(cfg, entry)** - determines whether a CFG is reducible.
 
 ## Usage
-In the table below are all assignments found within this repository as well as a description of their intended purpose. All assignments can be found in the directory with the same name (e.g. Working with CFGs can be found in /Assigment-WorkingWithCFGs). Each assignment has an attached README for further details and usage instructions.
+Please refer to the /AdvancedCompilers/README.md to view how to run all assignments, including Working with CFGs
 
-Assignment           | Description
--------------------- | -----------
-Working with CFGS    | A python program made to construct a control flow graph (CFG) along with useful functions
-...                  | ...
-...                  | ...
-...                  | ...
+**NOTE:** AdvancedCompilers Repository must be within the /bril directory as all test cases have been programmed considering said PATH. However, if you clone in a different directory, necessary edits must be made with certain programs.
+
+### Modes
+Arguments         | Functionality
+------------- | -----------
+-c            | creates a cfg and prints it
+-l            | find the path lengths of a cfg
+-p            | computes the reverse post order for a CFG
+-b            | finds all the back edges within a CFG
+-r            | determines where a CFG is reducible
+
+### How to run each mode
+Below is how to run each mode. Keep in mind that the provided 
+**-c**
+```bash
+bril2json < ../[path].bril | python3 mycfg.py -c
+```
+
+**-l**
+```bash
+bril2json < ../[path].bril | python3 mycfg.py -l
+```
+
+**-p**
+```bash
+bril2json < ../[path].bril | python3 mycfg.py -p
+```
+
+**-b**
+```bash
+bril2json < ../[path].bril | python3 mycfg.py -b
+```
+
+**-r**
+```bash
+bril2json < ../[path].bril | python3 mycfg.py -r
+```
+
+## Testing
+All test cases are located in the /test subdirectory.
+
+To run all test, use:
+```bash
+turnt *.bril
+```
+**Note:** For testing to work, the directory structure must be the same as stated in the AdvancedCompilers' README. 
