@@ -35,7 +35,8 @@ Arguments         | Functionality
 -r            | determines where a CFG is reducible
 
 ### How to run each mode
-Below is how to run each mode. Keep in mind that the provided 
+Below is how to run each mode. Keep in mind that the provided [path] is subjective to which bril file you want to use and where it is located.
+
 **-c**
 ```bash
 bril2json < ../[path].bril | python3 mycfg.py -c
