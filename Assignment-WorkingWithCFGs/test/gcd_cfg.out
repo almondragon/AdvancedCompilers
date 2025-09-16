@@ -1,0 +1,22 @@
+digraph main {
+  b0;
+  cmpval;
+  if1;
+  else1;
+  loopbound;
+  updateval;
+  if2;
+  else2;
+  programend;
+  b0 -> cmpval;
+  cmpval -> if1;
+  cmpval -> else1;
+  if1 -> loopbound;
+  else1 -> loopbound;
+  loopbound -> programend;
+  loopbound -> updateval;
+  updateval -> if2;
+  updateval -> else2;
+  if2 -> cmpval;
+  else2 -> cmpval;
+}

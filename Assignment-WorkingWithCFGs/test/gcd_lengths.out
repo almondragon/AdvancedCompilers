@@ -1,0 +1,11 @@
+{
+  "b0": 0,
+  "cmpval": 1,
+  "if1": 2,
+  "else1": 2,
+  "loopbound": 3,
+  "programend": 4,
+  "updateval": 4,
+  "if2": 5,
+  "else2": 5
+}
