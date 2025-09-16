@@ -9,6 +9,7 @@ Assignment: Control Flow Graph (CFG) Program
 
 import json
 import sys
+import getopt
 from collections import deque # for queue implementation
 
 TERMS = 'jmp', 'br', 'ret' # terminators used to indicate a change of control flow
@@ -196,11 +197,14 @@ def is_reducible(cfg, entry):
                 
 def mycfg():
     
-    if len(sys.argv) < 2:
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "clpbr")
+    except getopt.GetoptError as err:
+        print(err)
         print("Usage: python3 mycfg.py [-c|-l|-p|-b|-r]")
         sys.exit(1)
         
-    mode = sys.argv[1]
+    mode = opts[0][0]
     
     prog = json.load(sys.stdin)
     
