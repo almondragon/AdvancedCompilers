@@ -195,18 +195,55 @@ def is_reducible(cfg, entry):
                 
                 
 def mycfg():
+    
+    if len(sys.argv) < 2:
+        print("Usage: python3 mycfg.py [-c|-l|-p|-b|-r]")
+        sys.exit(1)
+        
+    mode = sys.argv[1]
+    
     prog = json.load(sys.stdin)
+    
     for func in prog['functions']:
         name_to_block = block_map(basic_block_alg(func['instrs']))
         cfg = cfg_alg(name_to_block)
+        
+        entry = list(name_to_block.keys())[0] # pulling the first block
+        
+        if mode == "-c":
+            print('digraph {} {{'.format(func['name']))
+            for name in name_to_block:
+                print('  {};'.format(name))
+            for name, succs in cfg.items():
+                for succ in succs:
+                    print ('  {} -> {};'.format(name,succ))
+            print('}')
+        elif mode == "-l":
+            lengths = get_path_lengths(cfg, entry)
+            print(json.dumps(lengths, indent=2))
+        elif mode == "-p":
+            order = reverse_postorder(cfg, entry)
+            print("This is the reverse order: ", order)
+        elif mode == "-b":
+            back_edges = find_back_edges(cfg, entry)
+            if back_edges:
+                print(back_edges)
+            else:
+                print("No back edges were found in the given CFG.")
+        elif mode == "-r":
+            reducible = is_reducible(cfg, entry)
+            if reducible:
+                print("Reducible")
+            else:
+                print("Not reducible")
+        else:
+            print("Invalid mode. Use -c, -l, -p, -b, or -r.")
+        
+        
+            
+            
                      
-        print('digraph {} {{'.format(func['name']))
-        for name in name_to_block:
-            print('  {};'.format(name))
-        for name, succs in cfg.items():
-            for succ in succs:
-                print ('  {} -> {};'.format(name,succ))
-        print('}')
+        
                 
 
 if __name__ == '__main__':
