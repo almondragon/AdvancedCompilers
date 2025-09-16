@@ -1,0 +1,18 @@
+@main {
+#ARGS: -p
+.entry:
+  v0: int = const 0;
+  br v0 .A .B;
+
+.A:
+  print v0;
+  jmp .C;
+
+.B:
+  print v0;
+  jmp .C;
+
+.C:
+  v1: int = const 1;
+  br v1 .A .B;
+}
