@@ -103,7 +103,7 @@ def reverse_postorder(cfg, entry):
     def dfs_traversal(node):
         visited.add(node)
         successors = cfg[node]
-        for succ in sorted(successors): 
+        for succ in successors: 
             if succ not in visited:
                 dfs_traversal(succ)
         post_order.append(node)

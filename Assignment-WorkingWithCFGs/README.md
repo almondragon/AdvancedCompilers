@@ -62,11 +62,36 @@ bril2json < ../[path].bril | python3 mycfg.py -b
 bril2json < ../[path].bril | python3 mycfg.py -r
 ```
 
-## Testing
+## Testing & Test Cases
 All test cases are located in the /test subdirectory.
 
+### Testing
+Use the following command to enter the directory for testing:
+```bash
+cd test/
+```
 To run all test, use:
 ```bash
 turnt *.bril
 ```
+
+### Test Cases
+Below are all the test cases and the functionality for which they test.
+
+1. figure8_back_edges.bril - tests the back_edge functionality
+2. figure8_cfg.bril - test the cfg generation functionality
+3. figure8_lengths.bril - test the get path lengths functionality
+4. figure_reducible.bril - test whether the cfg is reducible functionality
+5. figure_reverse_postorder.bril - test reverse post order functionality
+6. gcd_back_edges.bril - tests the back_edge functionality
+7. gcd_cfg.bril - test the cfg generation functionality 
+8. gcd_lengths.bril - test the get path lengths functionality
+9. gcd_reducible.bril - test whether the cfg is reducible functionality
+10. gcd_reverse_postorder.bril - test reverse post order functionality
+11. jmp_back_edges.bril - tests the back_edge functionality
+12. jmp_cfg.bril - test the cfg generation functionality
+13. jmp_lengths.bril - test the get path lengths functionality
+14. jmp_reducible.bril - test whether the cfg is reducible functionality
+15. jmp_reverse_postorder.bril - test reverse post order functionality
+
 **Note:** For testing to work, the directory structure must be the same as stated in the AdvancedCompilers' README. 
