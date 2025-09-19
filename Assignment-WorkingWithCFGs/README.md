@@ -65,7 +65,7 @@ bril2json < ../[path].bril | python3 mycfg.py -r
 NOTE: To run the following, the path set up (e.g. where this repository is cloned) must be identical to what is specified in the usage instructions.
 
 ```bash
-bril2json < ../../benchmarks/core/jmp.bril | python3 mycfg.py -c
+bril2json < ../../test/interp/core/jmp.bril | python3 mycfg.py -c
 ```
 
 ```bash
