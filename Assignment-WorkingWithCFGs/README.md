@@ -74,7 +74,7 @@ bril2json < ../../benchmarks/core/gcd.bril | python3 mycfg.py -l
 ### To run GraphViz
 NOTE: To run the following, the path set up (e.g. where this repository is cloned) must be identical to what is specified in the usage instructions.
 ```bash
-../../benchmarks/core/gcd.bril | python3 mycfg.py -c | dot -Tpdf -o cfg.pdf
+bril2json < ../../benchmarks/core/gcd.bril | python3 mycfg.py -c | dot -Tpdf -o cfg.pdf
 ```
 
 
@@ -111,4 +111,5 @@ Below are all the test cases and the functionality for which they test.
 15. jmp_reverse_postorder.bril - test reverse post order functionality
 
 **Note:** For testing to work, the directory structure must be the same as stated in the AdvancedCompilers' README. 
+
 
