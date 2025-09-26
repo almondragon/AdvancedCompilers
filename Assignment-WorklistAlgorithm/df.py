@@ -10,6 +10,7 @@ import cfg
 # - init: An initial value (bottom or top of the latice).
 # - merge: Take a list of values and produce a single value.
 # - transfer: The transfer function.
+
 Analysis = namedtuple("Analysis", ["forward", "init", "merge", "transfer"])
 
 
@@ -18,7 +19,6 @@ def union(sets):
     for s in sets:
         out.update(s)
     return out
-
 
 def df_worklist(blocks, analysis):
     """The worklist algorithm for iterating a data flow analysis to a
@@ -152,6 +152,18 @@ ANALYSES = {
     ),
     # A simple constant propagation pass.
     "cprop": Analysis(
+        True,
+        init={},
+        merge=cprop_merge,
+        transfer=cprop_transfer,
+    ),
+    "reaching": Analysis(
+        True,
+        init={},
+        merge=cprop_merge,
+        transfer=cprop_transfer,
+    ),
+    "available": Analysis(
         True,
         init={},
         merge=cprop_merge,
