@@ -20,6 +20,14 @@ def union(sets):
         out.update(s)
     return out
 
+def intersection(sets):
+    if not sets:
+        return set()
+    out = sets[0]
+    for s in sets[1:]:
+        out.intersection_update(s)
+    return out
+
 def df_worklist(blocks, analysis):
     """The worklist algorithm for iterating a data flow analysis to a
     fixed point.
@@ -66,7 +74,7 @@ def fmt(val):
     """
     if isinstance(val, set):
         if val:
-            return ", ".join(v for v in sorted(val))
+            return ", ".join(sorted({v[0] if isinstance(v, tuple) else v for v in val}))
         else:
             return "∅"
     elif isinstance(val, dict):
@@ -95,6 +103,16 @@ def gen(block):
     """Variables that are written in the block."""
     return {i["dest"] for i in block if "dest" in i}
 
+def gen_expr(block):
+    gen = set()
+    for instr in block:
+        if instr["op"] in {"add", "sub", "mul", "div"}:
+            gen.add((instr["op"], instr["args"][0], instr["args"][1]))
+
+def gen_reach(block):
+    print("this is block", block)
+    return {(instr["dest"], id(instr)) for instr in block if "dest" in instr}
+
 
 def use(block):
     """Variables that are read before they are written in the block."""
@@ -105,6 +123,24 @@ def use(block):
         if "dest" in i:
             defined.add(i["dest"])
     return used
+
+def kill_reach(block, in_defs):
+    defined_vars = {instr["dest"] for instr in block if "dest" in instr}
+    return {defs for defs in in_defs if defs[0] not in defined_vars}
+
+def kill_expr(block,uni_set):
+    killed_vars = {instr["dest"] for instr in block if "dest" in instr}
+    return {expr for expr in uni_set if expr[1] in killed_vars or expr[2] in killed_vars}
+    
+
+def reaching_transfer(block, in_defs):
+    return gen_reach(block) | kill_reach(block, in_defs)
+
+def available_transfer(block, in_exprs):
+    out_exprs = set(in_exprs)
+    out_exprs -= kill_expr(block, in_exprs)
+    out_exprs |= gen_expr(block)
+    return out_exprs
 
 
 def cprop_transfer(block, in_vals):
@@ -157,17 +193,19 @@ ANALYSES = {
         merge=cprop_merge,
         transfer=cprop_transfer,
     ),
+    # Reaching definitions analysis
     "reaching": Analysis(
         True,
-        init={},
-        merge=cprop_merge,
-        transfer=cprop_transfer,
+        init=set(),
+        merge=union,
+        transfer=reaching_transfer #similarly to live transfer equation set up,
     ),
+    # Available expressions analysis
     "available": Analysis(
         True,
         init={},
         merge=cprop_merge,
-        transfer=cprop_transfer,
+        transfer=True #simiarlly to live transfer equation set up,
     ),
 }
 
