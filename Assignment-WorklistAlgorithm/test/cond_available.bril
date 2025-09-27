@@ -1,4 +1,5 @@
 @main {
+#ARGS: available
   a: int = const 47;
   b: int = const 42;
   cond: bool = const true;

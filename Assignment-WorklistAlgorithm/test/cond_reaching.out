@@ -1,0 +1,12 @@
+b1:
+  in:  ∅
+  out: ('a', 'b1'), ('b', 'b1'), ('cond', 'b1')
+left:
+  in:  ('a', 'b1'), ('b', 'b1'), ('cond', 'b1')
+  out: ('a', 'b1'), ('b', 'left'), ('c', 'left'), ('cond', 'b1')
+right:
+  in:  ('a', 'b1'), ('b', 'b1'), ('cond', 'b1')
+  out: ('a', 'right'), ('b', 'b1'), ('c', 'right'), ('cond', 'b1')
+end:
+  in:  ('a', 'b1'), ('a', 'right'), ('b', 'b1'), ('b', 'left'), ('c', 'left'), ('c', 'right'), ('cond', 'b1')
+  out: ('a', 'b1'), ('a', 'right'), ('b', 'b1'), ('b', 'left'), ('c', 'left'), ('c', 'right'), ('cond', 'b1'), ('d', 'end')

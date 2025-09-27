@@ -1,0 +1,12 @@
+b1:
+  in:  ('sub', ('a', 'c'))
+  out: ∅
+left:
+  in:  ∅
+  out: ∅
+right:
+  in:  ∅
+  out: ∅
+end:
+  in:  ∅
+  out: ('sub', ('a', 'c'))

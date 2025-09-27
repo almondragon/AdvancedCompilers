@@ -1,0 +1,27 @@
+b1:
+  in:  ∅
+  out: ('v0', 'b1'), ('v1', 'b1'), ('vc0', 'b1')
+cmpval:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+if1:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+else1:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v4', 'loopbound'), ('vc0', 'b1')
+loopbound:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+updateval:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+if2:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+else2:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+programend:
+  in:  ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')
+  out: ('v0', 'b1'), ('v0', 'else2'), ('v1', 'b1'), ('v1', 'if2'), ('v2', 'cmpval'), ('v3', 'else1'), ('v3', 'if1'), ('v4', 'loopbound'), ('vc0', 'b1')

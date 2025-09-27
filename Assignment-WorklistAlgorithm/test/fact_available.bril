@@ -1,4 +1,5 @@
 @main {
+#ARGS: available
   result: int = const 1;
   i: int = const 8;
 

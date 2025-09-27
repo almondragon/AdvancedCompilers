@@ -1,0 +1,27 @@
+b1:
+  in:  ('sub', ('v0', 'v1')), ('sub', ('v1', 'v0'))
+  out: ∅
+cmpval:
+  in:  ∅
+  out: ∅
+if1:
+  in:  ∅
+  out: ('sub', ('v1', 'v0'))
+else1:
+  in:  ∅
+  out: ('sub', ('v0', 'v1'))
+loopbound:
+  in:  ∅
+  out: ∅
+updateval:
+  in:  ∅
+  out: ∅
+if2:
+  in:  ∅
+  out: ∅
+else2:
+  in:  ∅
+  out: ∅
+programend:
+  in:  ∅
+  out: ∅
