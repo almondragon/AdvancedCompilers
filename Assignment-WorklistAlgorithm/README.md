@@ -32,27 +32,27 @@ available     | runs an available expressions data flow analysis
 ### How to run each mode
 Below is how to run each mode. Keep in mind that the provided [path] is subjective to which bril file you want to use and where it is located.
 
-**-c**
+**defined**
 ```bash
 bril2json < ../[path].bril | python3 df.py defined
 ```
 
-**-l**
+**live**
 ```bash
 bril2json < ../[path].bril | python3 df.py live
 ```
 
-**-p**
+**cprop**
 ```bash
 bril2json < ../[path].bril | python3 df.py cprop
 ```
 
-**-b**
+**reaching**
 ```bash
 bril2json < ../[path].bril | python3 df.py reaching
 ```
 
-**-r**
+**available**
 ```bash
 bril2json < ../[path].bril | python3 df.py available
 ```
