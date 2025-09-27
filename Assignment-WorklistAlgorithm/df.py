@@ -147,8 +147,16 @@ def cprop_merge(vals_list):
 def gen_reach(block, label):
     return {(instr["dest"], label) for instr in block if "dest" in instr}
 
-def gen_kill(block):
-    return True
+def kill_reach(block, label, all_defs):
+    def_vars = {instr["dest"] for instr in block if "dest" in instr}
+    return {defs for defs in all_defs if defs[0] not in def_vars}
+
+# transfer function for reach
+def transfer_reach(block,label,all_defs):
+    return gen_reach(block, label) | kill_reach(block, label, all_defs)
+    
+        
+            
 
 
 # Built-in Analyses
