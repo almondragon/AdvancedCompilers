@@ -143,6 +143,13 @@ def cprop_merge(vals_list):
                     out_vals[name] = val
     return out_vals
 
+# Helper functions for reach
+def gen_reach(block, label):
+    return {(instr["dest"], label) for instr in block if "dest" in instr}
+
+def gen_kill(block):
+    return True
+
 
 # Built-in Analyses
 ANALYSES = {
