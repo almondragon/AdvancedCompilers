@@ -59,7 +59,7 @@ def df_worklist(blocks, analysis):
         inval = analysis.merge(out[n] for n in in_edges[node])
         in_[node] = inval
 
-        outval = analysis.transfer(blocks[node], inval)
+        outval = analysis.transfer(blocks[node], inval, node)
 
         if outval != out[node]:
             out[node] = outval
@@ -77,7 +77,7 @@ def fmt(val):
     """
     if isinstance(val, set):
         if val:
-            return ", ".join(v for v in sorted(val))
+            return ", ".join(str(v) for v in sorted(val))
         else:
             return "∅"
     elif isinstance(val, dict):
@@ -89,11 +89,14 @@ def fmt(val):
         return str(val)
 
 # Main method -> runs analysis
-def run_df(bril, analysis):
+def run_df(bril, analysis_name):
     for func in bril["functions"]:
         # Form the CFG.
         blocks = cfg.block_map(form_blocks(func["instrs"]))
         cfg.add_terminators(blocks)
+        
+        if analysis_name == "reaching":
+            analysis = reaching_defs(blocks)
 
         in_, out = df_worklist(blocks, analysis)
         for block in blocks:
@@ -143,21 +146,41 @@ def cprop_merge(vals_list):
                     out_vals[name] = val
     return out_vals
 
+# REACHING DEFS
+
 # Helper functions for reach
 def gen_reach(block, label):
     return {(instr["dest"], label) for instr in block if "dest" in instr}
 
 def kill_reach(block, label, all_defs):
-    def_vars = {instr["dest"] for instr in block if "dest" in instr}
-    return {defs for defs in all_defs if defs[0] not in def_vars}
+    kill_set = set()
+    for instr in block:
+        if "dest" in instr:
+            var = instr["dest"]
+            kill_set |= {d for d in all_defs if d[0]==var and d[1] != label}
+    return kill_set
 
-# transfer function for reach
-def transfer_reach(block,label,all_defs):
-    return gen_reach(block, label) | kill_reach(block, label, all_defs)
+# reaching defintions
+def reaching_defs(blocks):
+    all_defs = set()
+    for label, block in blocks.items():
+        for instr in block:
+            if "dest" in instr:
+                all_defs.add((instr["dest"],label))
+                
+    #transfer function for reach    
+    def reach_transfer(block, in_vals, label):
+        return gen_reach(block, label) | (in_vals - kill_reach(block, label, all_defs))
+    
+    return Analysis(
+        True,
+        init=set(),
+        merge=union,
+        transfer=reach_transfer)  
+
+# AVAILABLE EXPRESSIONS
     
         
-            
-
 
 # Built-in Analyses
 ANALYSES = {
@@ -188,4 +211,4 @@ ANALYSES = {
 
 if __name__ == "__main__":
     bril = json.load(sys.stdin)
-    run_df(bril, ANALYSES[sys.argv[1]])
+    run_df(bril, sys.argv[1])
