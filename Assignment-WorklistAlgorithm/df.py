@@ -179,8 +179,25 @@ def reaching_defs(blocks):
         transfer=reach_transfer)  
 
 # AVAILABLE EXPRESSIONS
-    
-        
+
+# Helper function for available expression
+def gen_expr(block):
+    gen_set = set()
+    for instr in block:
+        if instr["op"] in {"add", "sub", "mul", "div"}:
+            gen_set.add((instr["op"], tuple(instr["args"])))
+    return gen_set
+            
+
+def kill_expr(block, all_exprs):
+    kill_set = set()
+    def_vars = {instr["dest"] for instr in block if "dest" in instr}
+    for expr in all_exprs:
+        if any(var in def_vars for var in expr[1]):
+            kill_set.add(expr)
+    return kill_set
+            
+     
 
 # Built-in Analyses
 ANALYSES = {
