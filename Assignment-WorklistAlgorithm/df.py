@@ -13,28 +13,19 @@ import cfg
 
 Analysis = namedtuple("Analysis", ["forward", "init", "merge", "transfer"])
 
-# Union and Intersection Methods
+# Union Method
 def union(sets):
     out = set()
     for s in sets:
         out.update(s)
-    return out
-
-def intersection(sets):
-    sets = list(sets)
-    if not sets: # empty
-        return set()
-    inter_set = sets[0].copy()
-    for s in sets[1:]:
-        inter_set &= s
-    return inter_set
-    
+    return out    
 
 # Worklist algoritm
 def df_worklist(blocks, analysis):
     """The worklist algorithm for iterating a data flow analysis to a
     fixed point.
     """
+    
     preds, succs = cfg.edges(blocks)
 
     # Switch between directions.
@@ -48,6 +39,7 @@ def df_worklist(blocks, analysis):
         out_edges = preds
 
     # Initialize.
+
     in_ = {first_block: analysis.init}
     out = {node: analysis.init for node in blocks}
 
@@ -97,6 +89,10 @@ def run_df(bril, analysis_name):
         
         if analysis_name == "reaching":
             analysis = reaching_defs(blocks)
+        elif analysis_name == "available":
+            analysis = available_expressions(blocks)
+        else:
+            analysis = ANALYSES[analysis_name]
 
         in_, out = df_worklist(blocks, analysis)
         for block in blocks:
@@ -121,7 +117,7 @@ def use(block):
     return used
 
 
-def cprop_transfer(block, in_vals):
+def cprop_transfer(block, in_vals, _=None):
     out_vals = dict(in_vals)
     for instr in block:
         if "dest" in instr:
@@ -160,7 +156,7 @@ def kill_reach(block, label, all_defs):
             kill_set |= {d for d in all_defs if d[0]==var and d[1] != label}
     return kill_set
 
-# reaching defintions
+# reaching defintions analysis
 def reaching_defs(blocks):
     all_defs = set()
     for label, block in blocks.items():
@@ -197,7 +193,31 @@ def kill_expr(block, all_exprs):
             kill_set.add(expr)
     return kill_set
             
-     
+#available expression analysis
+
+def available_expressions(blocks):
+    universal_set = set() 
+    for block in blocks.values():
+        for instr in block:
+            if instr["op"] in {"add", "sub", "mul", "div"}:
+                universal_set.add((instr["op"], tuple(instr["args"])))
+    
+    def available_transfer(block, in_vals, _=None):
+        return gen_expr(block) | (in_vals - kill_expr(block, universal_set))
+    
+    def intersection(sets):
+        if not sets:
+            return universal_set.copy()
+        result = universal_set.copy()
+        for s in sets:
+            result &= s
+        return result
+    
+    return Analysis(
+        True,
+        init=universal_set,
+        merge=intersection,
+        transfer=available_transfer)
 
 # Built-in Analyses
 ANALYSES = {
@@ -207,7 +227,7 @@ ANALYSES = {
         True,
         init=set(),
         merge=union,
-        transfer=lambda block, in_: in_.union(gen(block)),
+        transfer=lambda block, in_, _: in_.union(gen(block)),
     ),
     # Live variable analysis: the variables that are both defined at a
     # given point and might be read along some path in the future.
@@ -215,7 +235,7 @@ ANALYSES = {
         False,
         init=set(),
         merge=union,
-        transfer=lambda block, out: use(block).union(out - gen(block)),
+        transfer=lambda block, out, _: use(block).union(out - gen(block)),
     ),
     # A simple constant propagation pass.
     "cprop": Analysis(
