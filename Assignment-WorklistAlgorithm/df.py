@@ -10,16 +10,27 @@ import cfg
 # - init: An initial value (bottom or top of the latice).
 # - merge: Take a list of values and produce a single value.
 # - transfer: The transfer function.
+
 Analysis = namedtuple("Analysis", ["forward", "init", "merge", "transfer"])
 
-
+# Union and Intersection Methods
 def union(sets):
     out = set()
     for s in sets:
         out.update(s)
     return out
 
+def intersection(sets):
+    sets = list(sets)
+    if not sets: # empty
+        return set()
+    inter_set = sets[0].copy()
+    for s in sets[1:]:
+        inter_set &= s
+    return inter_set
+    
 
+# Worklist algoritm
 def df_worklist(blocks, analysis):
     """The worklist algorithm for iterating a data flow analysis to a
     fixed point.
@@ -59,7 +70,7 @@ def df_worklist(blocks, analysis):
     else:
         return out, in_
 
-
+# Formatting helper method
 def fmt(val):
     """Guess a good way to format a data flow value. (Works for sets and
     dicts, at least.)
@@ -77,7 +88,7 @@ def fmt(val):
     else:
         return str(val)
 
-
+# Main method -> runs analysis
 def run_df(bril, analysis):
     for func in bril["functions"]:
         # Form the CFG.
@@ -90,7 +101,7 @@ def run_df(bril, analysis):
             print("  in: ", fmt(in_[block]))
             print("  out:", fmt(out[block]))
 
-
+# Helper methods
 def gen(block):
     """Variables that are written in the block."""
     return {i["dest"] for i in block if "dest" in i}
@@ -133,6 +144,7 @@ def cprop_merge(vals_list):
     return out_vals
 
 
+# Built-in Analyses
 ANALYSES = {
     # A really really basic analysis that just accumulates all the
     # currently-defined variables.
