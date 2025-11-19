@@ -1,114 +1,99 @@
-# Working with CFGs
-**Due Date:** September 12, 2025
+# Dead Store Elimination
+**Due Date:** November 23, 2025
 
-This folder of the repository contains a Python program for constructing control flow graphs (CFGs) for Bril programs. The code also implements additional functionality including computing path lengths, reverse post order traversal, back edge detection, as well as checking reducibility.
+This folder of the repository contains two Passes: MemorySSA and Dead Store Elimination.
+1. **MemorySSA Demo Pass** - build and prints MemorySSA information and generates a graphical DOT file of the MemorySSA graph.
+2. **Dead Store Elimination (DSE)** - an intraprocedural dead store elimination pass built using MemorySSA.
+
+Both passes operate on LLVM IR (.ll) files and are built as plugin passes for opt.
+
 
 ## Features
-### CFG Construction
-1. **basic_block_alg(instructions)** - takes a bril program's instructions and turns them into basic blocks
+### MemorySSA Pass & Graph Construction
+1. The pass iterates through each Basic Block and prints:
+- MemoryUse
+- MemoryDef
+- MemoryPhi
+2. Generates a DOT file named <function>_MemorySSA.dot
+- Nodes represent MemoryAccesses
+- Edges represent a defining-access relationship between nodes
 
-2. **block_map(blocks)** - maps basic blocks to names
+### Dead Store Elimination (DSE) Pass
+1. Implements a DSE Algorithm:
+- Analyzes dead stores found in a function
+- Eliminates dead stores found in a function
 
-3. **cfg_alg(nameblock_map)** - creates a CFG when given a map of named blocks.
-
-### CFG Analysis
-4. **get_path_lengths(cfg, entry)** - computes the shortest path length (in edges) from the entry node to each node in the CFG.
-
-5. **reverse_postorder(cfg, entry)** - compute reverse postorder for a CFG.
-
-6. **find_back_edges(cfg,entry)** - find back edges in a CFG using DFS.
-
-7. **is_reducible(cfg, entry)** - determines whether a CFG is reducible.
 
 ## Usage
-Please refer to the /AdvancedCompilers/README.md to view how to run all assignments, including Working with CFGs
+Use the provided commands in order to run each respective pass and generate the proper .ll files.
+**NOTE:** It is important to note that you might need to modify the commands based on where you are generating your files, what files you are testing, and what version of LLVM, clang, and opt you are using. 
 
-**NOTE:** AdvancedCompilers Repository must be within the /bril directory as all test cases have been programmed considering said PATH. However, if you clone in a different directory, necessary edits must be made with certain programs.
-
-### Modes
-Arguments         | Functionality
-------------- | -----------
--c            | creates a cfg and prints it
--l            | find the path lengths of a cfg
--p            | computes the reverse post order for a CFG
--b            | finds all the back edges within a CFG
--r            | determines where a CFG is reducible
-
-### How to run each mode
-Below is how to run each mode. Keep in mind that the provided [path] is subjective to which bril file you want to use and where it is located.
-
-**-c**
+### File Generation
+**Compile into .ll files**
 ```bash
-bril2json < ../[path].bril | python3 mycfg.py -c
+clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm test_mssa/demo2.c -o test_mssa/demo2.ll
+```
+**Optimize the .ll files**
+```bash
+opt -passes=mem2reg test/demo2.ll -S -o test_mssa/demo2_simplified.ll
 ```
 
-**-l**
+### Building the Passes
+Below is how to build each pass: MemorySSA and DeadStore Elim.
+
+**Compiling MemorySSADemo.cpp**
 ```bash
-bril2json < ../[path].bril | python3 mycfg.py -l
+clang++ -std=c++17 -fPIC -shared MemorySSADemo.cpp -o libMemorySSADemo.so $(llvm-config-21 --cxxflags --ldflags) -lLLVM
 ```
 
-**-p**
+**Compiling DeadStoreElim.cpp**
 ```bash
-bril2json < ../[path].bril | python3 mycfg.py -p
+clang++ -std=c++17 -fPIC -shared DeadStoreElim.cpp \
+    -o DeadStoreElim.so \
+    $(llvm-config-21 --cxxflags --ldflags --libs core analysis passes)
+
 ```
 
-**-b**
+### Running the Passes
+Below is how to run each pass and generate the graphical view of the MemorySSA.
+
+**Run the MemorySSADemo.cpp pass**
 ```bash
-bril2json < ../[path].bril | python3 mycfg.py -b
+opt-21 -load-pass-plugin=./libMemorySSADemo.so -passes=memssa-demo \
+test/demo2_simplified.ll -disable-output
 ```
 
-**-r**
+**Run the DeadStoreElim.cpp pass**
 ```bash
-bril2json < ../[path].bril | python3 mycfg.py -r
-```
-### Actual Example Runs
-NOTE: To run the following, the path set up (e.g. where this repository is cloned) must be identical to what is specified in the usage instructions.
-
-```bash
-bril2json < ../../test/interp/core/jmp.bril | python3 mycfg.py -c
+opt-21 -load-pass-plugin ./DeadStoreElim.so -passes=dead-store-elim test_dse/demo2_simplified.ll -S -o output_dse/demo2_dse.ll
 ```
 
+**Generating the graph**
 ```bash
-bril2json < ../../benchmarks/core/gcd.bril | python3 mycfg.py -l
+dot -Tpng YourFunctionName_MemorySSA.dot -o MemorySSA.png
 ```
-### To run GraphViz
-NOTE: To run the following, the path set up (e.g. where this repository is cloned) must be identical to what is specified in the usage instructions.
-```bash
-bril2json < ../../benchmarks/core/gcd.bril | python3 mycfg.py -c | dot -Tpdf -o cfg.pdf
-```
-
 
 ## Testing & Test Cases
-All test cases are located in the /test subdirectory.
+All test cases are located in the /test_dse subdirectory.
 
-### Testing
-Use the following command to enter the directory for testing:
+### Running Tests
+Tests are .ll programs that exercise various DSE scenarios.
+
+NOTE: That to test your own files, you must compile your .c file into LLVM and optimize.
+
+Use the following command to test files in the subdirectory (post compiling and optimization):
 ```bash
-cd test/
-```
-To run all test, use:
-```bash
-turnt *.bril
+opt-21 -load-pass-plugin ./DeadStoreElim.so -passes=dead-store-elim test_dse/demo2_simplified.ll -S -o output_dse/demo2_dse.ll
 ```
 
 ### Test Cases
-Below are all the test cases and the functionality for which they test.
+Below are all the test cases and the functionality for which they test. 
 
-1. figure8_back_edges.bril - tests the back_edge functionality
-2. figure8_cfg.bril - test the cfg generation functionality
-3. figure8_lengths.bril - test the get path lengths functionality
-4. figure_reducible.bril - test whether the cfg is reducible functionality
-5. figure_reverse_postorder.bril - test reverse post order functionality
-6. gcd_back_edges.bril - tests the back_edge functionality
-7. gcd_cfg.bril - test the cfg generation functionality 
-8. gcd_lengths.bril - test the get path lengths functionality
-9. gcd_reducible.bril - test whether the cfg is reducible functionality
-10. gcd_reverse_postorder.bril - test reverse post order functionality
-11. jmp_back_edges.bril - tests the back_edge functionality
-12. jmp_cfg.bril - test the cfg generation functionality
-13. jmp_lengths.bril - test the get path lengths functionality
-14. jmp_reducible.bril - test whether the cfg is reducible functionality
-15. jmp_reverse_postorder.bril - test reverse post order functionality
+1. test_dse1_simp.ll - tests a simple single store program
+2. test_dse2_simp.ll - tests a store followed by a load
+3. test_dse3_simp.ll - tests multiple pointers
+4. test_dse4_simp.ll - tests a store in a loop
+5. test_dse5_simp.ll - general testing
 
 **Note:** For testing to work, the directory structure must be the same as stated in the AdvancedCompilers' README. 
 
