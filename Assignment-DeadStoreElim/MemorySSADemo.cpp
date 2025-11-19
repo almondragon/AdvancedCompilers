@@ -8,6 +8,67 @@
 
 using namespace llvm;
 
+void writeMemorySSADot(Function &F, MemorySSA &MSSA) {
+    // preparing the DOT file for the graph
+    std::error_code EC;
+    std::string FileName = F.getName().str() + "_MemorySSA.dot";
+    raw_fd_ostream File(FileName, EC, sys::fs::OF_Text);
+
+    if (EC){
+      errs() << "Error opening file " << FileName << ": " << EC.message() << "\n";
+      return;
+    }
+
+    // doing the header for the graph
+    File << "digraph MemorySSA_" << F.getName() << " {\n";
+    File << " node [shape=box, style=filled, fillcolor=lightblue];\n";
+
+    // iterate over memory access
+    for (auto &BB : F) {
+        for (auto &I : BB) {
+            if (auto *MA = MSSA.getMemoryAccess(&I)) {
+                std::string NodeName;
+                raw_string_ostream NodeStream(NodeName);
+                MA->print(NodeStream);
+                NodeStream.flush();
+
+                // sanitize quotes
+                for (auto &c : NodeName) if (c == '"') c = '\'';
+
+                File << "  \"" << (void*)MA << "\" [label=\"" << NodeName << "\"];\n";
+
+                // draw edge to defining access
+                if (auto *Def = MA->getDefiningAccess()) {
+                    File << "  \"" << (void*)Def << "\" -> \"" << (void*)MA << "\";\n";
+                }
+            }
+        }
+
+        // Handle MemoryPhi at block entry
+        if (auto *Phi = MSSA.getMemoryAccess(&BB)) {
+            if (auto *MPhi = dyn_cast<MemoryPhi>(Phi)) {
+                std::string PhiName;
+                raw_string_ostream PhiStream(PhiName);
+                MPhi->print(PhiStream);
+                PhiStream.flush();
+                for (auto &c : PhiName) if (c == '"') c = '\'';
+
+                File << "  \"" << (void*)MPhi << "\" [label=\"" << PhiName << "\", shape=diamond];\n";
+
+                // incoming edges
+                for (unsigned i = 0; i < MPhi->getNumIncomingValues(); ++i) {
+                    auto *IncomingAcc = MPhi->getIncomingValue(i);
+                    File << "  \"" << (void*)IncomingAcc << "\" -> \"" << (void*)MPhi << "\";\n";
+                }
+            }
+        }
+    }
+
+    File << "}\n";
+
+    errs() << "MemorySSA graph written to " << FileName << "\n";
+}
+
 struct MemorySSADemoPass : PassInfoMixin<MemorySSADemoPass> {
   PreservedAnalyses run(Function &F, FunctionAnalysisManager &AM) {
     auto &MSSAResult = AM.getResult<MemorySSAAnalysis>(F);
@@ -42,6 +103,10 @@ struct MemorySSADemoPass : PassInfoMixin<MemorySSADemoPass> {
         }
       }
     }
+
+    // call helper
+
+    writeMemorySSADot(F, MSSA);
 
     return PreservedAnalyses::all();
   }
