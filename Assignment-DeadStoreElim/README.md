@@ -35,8 +35,9 @@ clang -O0 -Xclang -disable-O0-optnone -S -emit-llvm test_mssa/demo2.c -o test_ms
 ```
 **Optimize the .ll files**
 ```bash
-opt -passes=mem2reg test/demo2.ll -S -o test_mssa/demo2_simplified.ll
+opt -passes=mem2reg test_mssa/demo2.ll -S -o test_mssa/demo2_simplified.ll
 ```
+NOTE: Change test_[name] depending on the pass you are testing (i.e. test_mssa for MemorySSSA and test_dse for Dead Store Elimination).
 
 ### Building the Passes
 Below is how to build each pass: MemorySSA and DeadStore Elim.
@@ -48,10 +49,8 @@ clang++ -std=c++17 -fPIC -shared MemorySSADemo.cpp -o libMemorySSADemo.so $(llvm
 
 **Compiling DeadStoreElim.cpp**
 ```bash
-clang++ -std=c++17 -fPIC -shared DeadStoreElim.cpp \
-    -o DeadStoreElim.so \
-    $(llvm-config-21 --cxxflags --ldflags --libs core analysis passes)
-
+clang++ -std=c++17 -fPIC -shared DeadStoreElim.cpp -o DeadStoreElim.so \
+$(llvm-config-21 --cxxflags --ldflags --libs core analysis passes)
 ```
 
 ### Running the Passes
@@ -60,17 +59,17 @@ Below is how to run each pass and generate the graphical view of the MemorySSA.
 **Run the MemorySSADemo.cpp pass**
 ```bash
 opt-21 -load-pass-plugin=./libMemorySSADemo.so -passes=memssa-demo \
-test/demo2_simplified.ll -disable-output
+test_mssa/demo2_simplified.ll -disable-output
 ```
 
 **Run the DeadStoreElim.cpp pass**
 ```bash
-opt-21 -load-pass-plugin ./DeadStoreElim.so -passes=dead-store-elim test_dse/demo2_simplified.ll -S -o output_dse/demo2_dse.ll
+opt-21 -load-pass-plugin ./DeadStoreElim.so -passes=dead-store-elim test_dse/test_dse1_simp.ll -S -o output_dse/test_dse1_o.ll
 ```
 
 **Generating the graph**
 ```bash
-dot -Tpng YourFunctionName_MemorySSA.dot -o MemorySSA.png
+dot -Tpng [function_name]_MemorySSA.dot -o MemorySSA.png
 ```
 
 ## Testing & Test Cases
@@ -81,7 +80,7 @@ Tests are .ll programs that exercise various DSE scenarios.
 
 NOTE: That to test your own files, you must compile your .c file into LLVM and optimize.
 
-Use the following command to test files in the subdirectory (post compiling and optimization):
+Use the following command to test files in the subdirectory (post compiling and optimization). This can be done manually for each file:
 ```bash
 opt-21 -load-pass-plugin ./DeadStoreElim.so -passes=dead-store-elim test_dse/demo2_simplified.ll -S -o output_dse/demo2_dse.ll
 ```
