@@ -23,7 +23,7 @@ In the table below are all assignments found within this repository as well as a
 Assignment           | Description
 -------------------- | -----------
 Working with CFGS    | A python program made to construct a control flow graph (CFG) along with useful functions
-...                  | ...
-...                  | ...
+Worklist Algorithm   | A python program made to do a variety of data flow analysis, specifically reaching definitions & available expressions.
+Dead Store Elim.     | Implements passes for MemorySSA & Dead Store Elimination
 ...                  | ...
 
